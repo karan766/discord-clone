@@ -26,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from "next/navigation";
@@ -34,8 +33,8 @@ import { useModal } from "@/hooks/use-modal-store";
 import { ChannelType } from "@/lib/generated/prisma/client";
 import qs from "query-string";
 import { useEffect } from "react";
-import { channel } from "diagnostics_channel";
 
+// This is the schema for the form
 const formSchema = z.object({
   name: z
     .string()
@@ -50,49 +49,52 @@ const formSchema = z.object({
   }),
 });
 
-const CreateChannelModal = () => {
-  const { type, isOpen, onClose ,data} = useModal();
+const EditChannelModal = () => {
+  
+  const { type, data, isOpen, onClose } = useModal();
   const router = useRouter();
-  const params = useParams();
-  const isModalOpen = type === "createChannel" && isOpen;
-  const {channelType} = data ;
 
+  const { channel , server } = data;
+
+ 
+  const isModalOpen = type === "editChannel" && isOpen;
+
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      type: ChannelType.TEXT,
+      type: channel?.type || ChannelType.TEXT,
     },
   });
 
   useEffect(() => {
-  if(channelType){
-    form.setValue("type", channelType);
-  }else{
-    form.setValue("type", ChannelType.TEXT);
-  }
-  }, [channelType, form]);
-  
-
+    if (channel) {
+      form.reset({
+        name: channel.name,
+        type: channel.type,
+      });
+    }
+  }, [channel, form]);
+ 
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // Build the API URL for creating a channel, including optional serverId as a query parameter
-      const Url = qs.stringifyUrl({
-        url: "/api/channels",
-        query: { serverId: params?.serverId },
-      });
-
-      await axios.post(Url, values);
-
+      
+        const url = qs.stringifyUrl({
+            url: `/api/channels/${channel?.id}`,
+            query: { serverId: server?.id },
+          });
+          
+          await axios.patch(url, values);
+          
       form.reset();
       router.refresh();
- 
       onClose();
     } catch (error) {
-      // Handle error
-      console.error("Error creating server:", error);
+  
+      console.error("Error editing channel:", error);
     }
   };
 
@@ -107,11 +109,11 @@ const CreateChannelModal = () => {
       <Dialog open={isModalOpen} onOpenChange={handleClose}>
         <DialogContent
           className="overflow-hidden bg-white p-0 text-black"
-          aria-describedby="Create channel for your server"
+          aria-describedby="Edit channel"
         >
           <DialogHeader className="px-6 pt-8">
             <DialogTitle className="text-center text-2xl font-bold">
-              Create Channel
+              Edit Channel
             </DialogTitle>
           </DialogHeader>
           <Form {...form}>
@@ -179,7 +181,7 @@ const CreateChannelModal = () => {
                   variant={"primary"}
                   className="w-full"
                 >
-                  Create
+                  Save
                 </Button>
               </DialogFooter>
             </form>
@@ -190,4 +192,4 @@ const CreateChannelModal = () => {
   );
 };
 
-export default CreateChannelModal;
+export default EditChannelModal;

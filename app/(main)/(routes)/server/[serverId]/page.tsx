@@ -1,10 +1,51 @@
 import React from 'react'
+import  currentProfile  from '@/lib/current-profile'
+import { redirect } from 'next/navigation'
+import { db } from '@/lib/db'
 
-const ServerPage = () => {
+interface ServerPageProps {
+  params:{
+    serverId:string
+  }
+}
+
+const ServerPage = async(
+  {params}:ServerPageProps
+) => {
+  const profile = await currentProfile();
+
+  if(!profile){
+    return redirect('/sign-in')
+  }
+  const server = await db.server.findUnique({
+    where: {
+      id: params.serverId,
+      members: {
+        some: {
+          profileId: profile.id,
+        },
+      },
+    },
+    include:{
+      channels:{
+        where:{
+          name:"general"
+        },
+        orderBy:{
+          createdAt:"asc"
+        }
+      },
+    }
+  });
+     
+       const initialChannel = server?.channels[0];
+
+       if(initialChannel?.name !== "general"){
+        return null;
+       }
+
   return (
-    <div>
-      Server page
-    </div>
+     redirect(`/server/${params.serverId}/channels/${initialChannel?.id}`)
   )
 }
 
