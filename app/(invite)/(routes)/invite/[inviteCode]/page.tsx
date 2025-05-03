@@ -3,15 +3,18 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import  CurrentProfile  from "@/lib/current-profile";
 
-interface InviteCodePageProps {
+
+
+const InviteCodePage = async ({
+  params,
+}: {
   params: Promise<{
     inviteCode: string;
   }>;
-}
-
-const InviteCodePage = async ({ params }: InviteCodePageProps) => {
+}) => {
   // Fetch the current profile
   const profile = await CurrentProfile();
+  
 
   // Check if the profile is null or undefined
   if (!profile) {

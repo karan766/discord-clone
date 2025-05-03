@@ -6,6 +6,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+
+[data-slot="popover-content"],
+[data-slot="popover-content"] * {
+ 
+  background-color: #000000 !important;
+  background-color: transparent !important;
+  
+}
+
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

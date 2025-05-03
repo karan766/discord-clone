@@ -5,19 +5,20 @@ import {v4 as uuid} from "uuid";
 
 export async function PATCH(
     req: Request,
-    { params }: { params: { serverId: string } }
+    { params }: { params: Promise<{ serverId: string }> }
 ) {
     try{
         const profile = await CurrentProfile();
+        const {serverId} = await params;
         if (!profile) {
             return new Response("Unauthorized", { status: 401 });
         }
-        if (!params.serverId) {
+        if (!serverId) {
             return new Response("Server ID is required", { status: 400 });
         }
          const server =await db.server.update({
             where: {
-                id: params.serverId,
+                id: serverId,
                 profileId: profile.id,
             },
             data: {

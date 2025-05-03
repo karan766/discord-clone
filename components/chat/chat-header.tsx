@@ -3,6 +3,7 @@ import MobileToggle from "@/components/mobile-toogle";
 import UserAvatar from "@/components/user-avatar";
 import { Socket } from "socket.io";
 import SocketIndicator from "../socket-indicator";
+import { ChatVideoButton } from "./chat-video-button";
 
 
 interface ChatHeaderProps {
@@ -15,7 +16,7 @@ interface ChatHeaderProps {
 const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
   return (
     <>
-      <div className="text-md flex h-12 items-center  border-b-2 border-neutral-200 px-3 font-semibold dark:border-neutral-800">
+      <div className="text-md flex h-12 items-center p-1  border-b-2 border-neutral-200 px-3 font-semibold dark:border-neutral-800">
         <MobileToggle serverId={serverId} />
      
         <div className="flex items-center">
@@ -30,7 +31,10 @@ const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
           </p>
           
         </div>
-        <div className="ml-auto flex items-center size-16">
+        <div className=" flex ml-auto items-center justify-end size-16">
+          {type ==="conversation"&& (
+            <ChatVideoButton />
+          )}
           <SocketIndicator />
         </div>
       </div>

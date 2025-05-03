@@ -77,7 +77,7 @@ const  OnKickUser = async (memberId: string) => {
       setLoadingId(memberId);
       const url = qsa.stringifyUrl({
         url: `/api/members/${memberId}`,
-        query: { serverID: server?.id },
+        query: { serverId: server?.id },
       });
       const response = await axios.delete(url);
       router.refresh();

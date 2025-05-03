@@ -5,10 +5,11 @@ import { MemberRole } from "@/lib/generated/prisma/client";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { channelId: string } }
+  { params }: { params: Promise<{ channelId: string }> }
 ) {
   try {
     const profile = await currentProfile();
+    const {channelId} = await params;
 
     if (!profile) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -23,7 +24,7 @@ export async function DELETE(
     }
 
     // Check if the channel ID is provided
-    if (!params.channelId) {
+    if (!channelId) {
       return new NextResponse("Channel ID is missing", { status: 400 });
     }
 
@@ -43,7 +44,7 @@ export async function DELETE(
       data: {
         channels: {
           delete: {
-            id: params.channelId,
+            id: channelId,
             name: {
               not: "general", 
             },
@@ -65,13 +66,14 @@ export async function DELETE(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { channelId: string } }
+  { params }: { params: Promise<{ channelId: string }> }
 ) {
   try {
     const profile = await currentProfile();
     const { name, type } = await req.json();
     const { searchParams } = new URL(req.url);
     const serverId = searchParams.get("serverId");
+    const { channelId } = await params;
 
     if (!profile) return new NextResponse("Unauthorized", { status: 401 });
     if (!serverId) return new NextResponse("Server ID is missing", { status: 400 });
@@ -93,7 +95,7 @@ export async function PATCH(
         channels: {
           update: {
             where: {
-              id: params.channelId,
+              id: channelId,
               NOT: { name: "general" },
             },
             data: { name, type },

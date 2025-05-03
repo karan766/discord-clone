@@ -11,7 +11,7 @@ const SocketIndicator = () => {
       <>
         <Badge
           variant="outline"
-          className="border-none bg-yellow-600 text-white"
+          className="border-none bg-yellow-600 text-white "
         >
           Connecting
         </Badge>

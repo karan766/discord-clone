@@ -1,14 +1,20 @@
 import currentProfile from "@/lib/current-profile";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import ChatMessages from "@/components/chat/chat-messages";
 import ChatInput from "@/components/chat/chat-input";
 import ChatHeader from "@/components/chat/chat-header";
+import {  ChannelType } from "@/lib/generated/prisma/client";
+import { MediaRoom } from "@/components/media-room";
+
+
 
 const ChannelIDPage = async ({
   params,
 }: {
   params: Promise<{ channelId: string; serverId: string }>;
-}) => {
+}
+  ) => {
 
   const profile = await  currentProfile();
   if (!profile) {
@@ -47,9 +53,19 @@ const ChannelIDPage = async ({
           name={channel.name}
           type="channel"
         />
-        <div className="flex flex-1">
-        Future Messages
-        </div>
+        {channel.type === ChannelType.TEXT && (
+          <>
+          <ChatMessages
+          name={channel.name}
+          member={member}
+          chatId={channelId}
+          apiUrl="/api/messages"
+          socketUrl="/api/socket/messages"
+          socketQuery={{ channelId, serverId }}
+          paramValue={channelId}
+          paramKey="channelId"
+          type="channel"
+        />
         <ChatInput
          name={channel.name}
          type="channel"
@@ -59,6 +75,19 @@ const ChannelIDPage = async ({
           serverId: channel.serverId,
         }}
         />
+          </>
+        )}
+        {channel.type === ChannelType.AUDIO && (
+          <>
+          <MediaRoom chatId={channelId} video={false} audio={true} />
+          </>
+        )}
+        {channel.type === ChannelType.VIDEO && (
+          <>
+          <MediaRoom chatId={channelId} video={true} audio={true} />
+          </>
+        )}
+        
       </div>
     </>
   );

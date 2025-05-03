@@ -46,12 +46,11 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params:{ serverId: string } }
+  { params }: { params: Promise<{ serverId: string }> }
 ) {
   try {
-    
-   
     const profile = await currentProfile();
+    const {serverId} = await params;
 
     if (!profile) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -59,7 +58,7 @@ export async function DELETE(
     // Update the server's data in the database
     const server = await db.server.delete({
       where: {
-        id: params.serverId,
+        id: serverId,
         profileId: profile.id,
       }
     });

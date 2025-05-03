@@ -100,7 +100,7 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
 
   return (
     <>
-      <UploadDropzone
+      {/* <UploadDropzone
         endpoint={endpoint}
         onClientUploadComplete={(res) => {
           onChange(res?.[0].ufsUrl);
@@ -110,7 +110,27 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
           // Do something with the error.
           console.error("Upload Error", err);
         }}
-      />
+      /> */}
+     <UploadDropzone
+  endpoint={endpoint}
+  onClientUploadComplete={(res) => {
+    if (!res || res.length === 0) return;
+
+    const uploadedFile = res[0];
+
+    const fileUrl = uploadedFile.url; // ✅ use public URL, not ufsUrl
+    const fileName = uploadedFile.name || "";
+    const extension = fileName.trim().split(".").pop()?.toLowerCase() || "";
+
+    onChange(fileUrl);        // ✅ This is the correct URL to display/render
+    setFileType(extension);   // ✅ Now this will correctly detect "pdf", "jpg", etc.
+  }}
+  onUploadError={(err: Error) => {
+    console.error("Upload Error", err);
+  }}
+/>
+
+
     </>
   );
 };

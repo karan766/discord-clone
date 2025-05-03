@@ -1,44 +1,49 @@
-"use client"
-import React from 'react'
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { Pi, Smile } from "lucide-react"
-import Picker from "@emoji-mart/react"
-import data from "@emoji-mart/data"
-import { useTheme } from 'next-themes'
 
+"use client";
+
+import React, { useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Smile } from "lucide-react";
+import EmojiPickerReact, { Theme } from "emoji-picker-react";
+import { useTheme } from 'next-themes';
 
 interface EmojiPickerProps {
-    onChange: (value: string) => void;
+  onChange: (value: string) => void;
 }
 
-const EmojiPicker = ({
-    onChange,
-}: EmojiPickerProps) => {
-    const {resolvedTheme} = useTheme();
+const EmojiPicker = ({ onChange }: EmojiPickerProps) => {
+  const [open, setOpen] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   return (
-    <Popover>
-        <PopoverTrigger>
-            <Smile className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition" />
-        </PopoverTrigger>
-        <PopoverContent
-            side="right"
-            sideOffset={40}
-            className="bg-transparent border-none shadow-none drop-shadoe-none mb-16"
-        >
-            <Picker
-                theme={resolvedTheme === "dark" ? "dark" : "light"}
-                data={data}
-                onEmojiSelect={(emoji: any) => onChange(emoji.native)}
-            />
-        </PopoverContent>
-        
-    </Popover>
-  )
-}
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button type="button">
+          <Smile className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition" />
+        </button>
+      </PopoverTrigger>
 
-export default EmojiPicker
+      <PopoverContent
+        side="right"
+        sideOffset={40}
+        className="mb-16 bg-white dark:bg-zinc-800 border-none shadow-none ring-0"
+      >
+        <EmojiPickerReact
+          onEmojiClick={(emojiData) => {
+            onChange(emojiData.emoji);
+            setOpen(false);
+          }}
+          theme={resolvedTheme === "dark" ? Theme.DARK : Theme.LIGHT}
+          lazyLoadEmojis
+          
+        />
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+export default EmojiPicker;
