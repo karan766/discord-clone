@@ -13,7 +13,7 @@ interface MemberIDPageProps {
     memberId: string;
     serverId: string;
   }>;
-  searchParams: { video?: boolean };
+  searchParams: { video?: boolean | undefined };
 }
 const MemberIdPage = async ({ params, searchParams }: MemberIDPageProps) => {
   const profile = await currentProfile();
