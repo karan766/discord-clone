@@ -29,7 +29,7 @@ const NavigationItem = ({ id, name, imageUrl }: NavigationItemProps) => {
           <div
             className={cn(
               "bg-primary absolute left-0 w-[4px] rounded-r-full transition-all",
-              params.serverId === id
+              params?.serverId === id
                 ? "h-[36px]"
                 : "h-[8px] group-hover:h-[20px]"
             )}
@@ -37,7 +37,7 @@ const NavigationItem = ({ id, name, imageUrl }: NavigationItemProps) => {
           <div
             className={cn(
               "group relative mx-3 flex size-[48px] overflow-hidden rounded-[24px] transition-all group-hover:rounded-[16px]",
-              params.serverId === id &&
+              params?.serverId === id &&
                 "bg-primary/10 text-primary rounded-[16px]"
             )}
           >

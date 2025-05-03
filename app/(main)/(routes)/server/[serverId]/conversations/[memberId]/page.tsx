@@ -13,7 +13,7 @@
 //     memberId: string;
 //     serverId: string;
 //   }>;
-//   searchParams: { video?: boolean | undefined };
+//   searchParams: { video?: string | null | undefined };
 // }
 // const MemberIdPage = async ({ params, searchParams }: MemberIDPageProps) => {
 //   const profile = await currentProfile();
@@ -97,8 +97,6 @@
 
 // export default MemberIdPage;
 
-
-import React from "react";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import currentProfile from "@/lib/current-profile";
@@ -108,19 +106,17 @@ import ChatMessages from "@/components/chat/chat-messages";
 import ChatInput from "@/components/chat/chat-input";
 import { MediaRoom } from "@/components/media-room";
 
-interface MemberIdPageProps {
-  params: {
+interface MemberIDPageProps {
+  params: Promise<{
     memberId: string;
     serverId: string;
-  };
-  searchParams: {
-    video?: string;
-  };
+  }>;
+  searchParams: Promise<{ video?: string | null | undefined }>; // searchParams should be a Promise
 }
 
-const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
+const MemberIdPage = async ({ params, searchParams }: MemberIDPageProps) => {
   const profile = await currentProfile();
-  const { serverId, memberId } = params;
+  const { serverId, memberId } = await params; // Awaiting params
 
   if (!profile) {
     return redirect("/sign-in");
@@ -128,7 +124,7 @@ const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
 
   const currentMember = await db.member.findFirst({
     where: {
-      serverId,
+      serverId: serverId,
       profileId: profile.id,
     },
     include: {
@@ -140,14 +136,23 @@ const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
     return redirect("/");
   }
 
-  const conversation = await getOrCreateConversation(currentMember.id, memberId);
+  const conversation = await getOrCreateConversation(
+    currentMember.id,
+    memberId
+  );
 
   if (!conversation) {
     return redirect(`/server/${serverId}`);
   }
 
   const { memberOne, memberTwo } = conversation;
-  const otherMember = memberOne.profileId === profile.id ? memberTwo : memberOne;
+  const otherMember =
+    memberOne.profileId === profile.id ? memberTwo : memberOne;
+
+  // Await searchParams to access the 'video' parameter
+  const { video } = await searchParams; // Awaiting searchParams
+
+  const isVideo = video === "true";
 
   return (
     <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
@@ -157,14 +162,9 @@ const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
         serverId={serverId}
         type="conversation"
       />
-      {searchParams?.video && (
-        <MediaRoom
-          chatId={conversation.id}
-          video={true}
-          audio={true}
-        />
-      )}
-      {!searchParams?.video && (
+      {isVideo ? (
+        <MediaRoom chatId={conversation.id} video audio />
+      ) : (
         <>
           <ChatMessages
             member={currentMember}
@@ -181,9 +181,7 @@ const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
             name={otherMember.profile.name}
             type="conversation"
             apiUrl="/api/socket/direct-messages"
-            query={{
-              conversationId: conversation.id,
-            }}
+            query={{ conversationId: conversation.id }}
           />
         </>
       )}
