@@ -112,26 +112,24 @@ import { MediaRoom } from "@/components/media-room";
 
 interface MemberIdPageProps {
   params: {
-    memberId: string;
     serverId: string;
+    memberId: string;
   };
   searchParams: {
-    video?: string; // `searchParams` values are strings (not booleans)
+    video?: string;
   };
 }
 
 const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
   const profile = await currentProfile();
 
-  if (!profile) {
-    return redirect("/sign-in");
-  }
+  if (!profile) return redirect("/sign-in");
 
   const { serverId, memberId } = params;
 
   const currentMember = await db.member.findFirst({
     where: {
-      serverId: serverId,
+      serverId,
       profileId: profile.id,
     },
     include: {
@@ -139,25 +137,17 @@ const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
     },
   });
 
-  if (!currentMember) {
-    return redirect("/");
-  }
+  if (!currentMember) return redirect("/");
 
-  const conversation = await getOrCreateConversation(
-    currentMember.id,
-    memberId
-  );
+  const conversation = await getOrCreateConversation(currentMember.id, memberId);
 
-  if (!conversation) {
-    return redirect(`/server/${serverId}`);
-  }
+  if (!conversation) return redirect(`/server/${serverId}`);
 
   const { memberOne, memberTwo } = conversation;
-
   const otherMember =
     memberOne.profileId === profile.id ? memberTwo : memberOne;
 
-  const isVideoEnabled = searchParams?.video === "true";
+  const isVideo = searchParams?.video === "true";
 
   return (
     <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
@@ -167,7 +157,7 @@ const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
         serverId={serverId}
         type="conversation"
       />
-      {isVideoEnabled ? (
+      {isVideo ? (
         <MediaRoom
           chatId={conversation.id}
           video={true}
