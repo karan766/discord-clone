@@ -19,7 +19,7 @@ const UserAvatar = ({
         "h-7 w-7 md:h-10 md:w-10",
         className
     )}>
-      <AvatarImage src={src}  />
+      <AvatarImage src={src} key={src} />
     </Avatar>
   )
 }

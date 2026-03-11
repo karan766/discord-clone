@@ -64,9 +64,9 @@ const EditServerModal = () => {
     try {
       await axios.patch(`/api/servers/${server?.id}`, data);
       form.reset();
-      router.refresh();
-
       onClose();
+      // Refresh the page to update server data and clear image cache
+      router.refresh();
     } catch (error) {
       console.error("Error creating server:", error);
     }

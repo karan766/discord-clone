@@ -47,6 +47,8 @@ const NavigationItem = ({ id, name, imageUrl }: NavigationItemProps) => {
               src={imageUrl}
               alt="Channel"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              unoptimized
+              key={imageUrl}
             />
           </div>
         </button>
