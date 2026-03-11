@@ -26,9 +26,18 @@ const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
       },
     });
 
-    res.socket.server.io = io;
+    io.on("connection", (socket) => {
+      console.log("✅ Client connected:", socket.id);
 
-   
+      socket.on("disconnect", () => {
+        console.log("❌ Client disconnected:", socket.id);
+      });
+    });
+
+    res.socket.server.io = io;
+    console.log("✅ Socket.IO server initialized successfully");
+  } else {
+    console.log("♻️ Socket.IO server already running");
   }
 
   res.end();
