@@ -38,7 +38,10 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
             />
           </a>
           <button
-            onClick={() => onChange("")}
+            onClick={() => {
+              onChange("");
+              setFileType("");
+            }}
             className="absolute -top-2 -right-2 rounded-full bg-rose-500 p-1 text-white shadow-sm"
             type="button"
           >
@@ -63,7 +66,10 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
             <p className="w-[390px] truncate text-wrap">{value}</p>
           </a>
           <button
-            onClick={() => onChange("")}
+            onClick={() => {
+              onChange("");
+              setFileType("");
+            }}
             className="absolute -top-2 -right-2 rounded-full bg-rose-500 p-1 text-white shadow-sm"
             type="button"
           >
@@ -74,7 +80,7 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
     );
   }
 
-  if (value && fileType !== "pdf") {
+  if (value && fileType !== "pdf" && fileType !== "") {
     return (
       <>
         <div className="relative size-20">
@@ -89,7 +95,10 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
             key={value}
           />
           <button
-            onClick={() => onChange("")}
+            onClick={() => {
+              onChange("");
+              setFileType("");
+            }}
             className="absolute top-0 right-0 rounded-full bg-rose-500 p-1 text-white shadow-sm"
             type="button"
           >
@@ -102,20 +111,10 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
 
   return (
     <>
-      {/* <UploadDropzone
-        endpoint={endpoint}
-        onClientUploadComplete={(res) => {
-          onChange(res?.[0].ufsUrl);
-          setFileType(res?.[0]?.name?.split(".").pop() || "");
-        }}
-        onUploadError={(err: Error) => {
-          // Do something with the error.
-          console.error("Upload Error", err);
-        }}
-      /> */}
      <UploadDropzone
   endpoint={endpoint}
   onClientUploadComplete={(res) => {
+    console.log("Upload complete:", res);
     if (!res || res.length === 0) return;
 
     const uploadedFile = res[0];
@@ -124,11 +123,22 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
     const fileName = uploadedFile.name || "";
     const extension = fileName.trim().split(".").pop()?.toLowerCase() || "";
 
+    console.log("File URL:", fileUrl);
+    console.log("File extension:", extension);
+
     onChange(fileUrl);        // ✅ This is the correct URL to display/render
     setFileType(extension);   // ✅ Now this will correctly detect "pdf", "jpg", etc.
   }}
   onUploadError={(err: Error) => {
-    console.error("Upload Error", err);
+    console.error("Upload Error:", err);
+    alert(`Upload failed: ${err.message}`);
+  }}
+  onBeforeUploadBegin={(files) => {
+    console.log("Starting upload for files:", files);
+    return files;
+  }}
+  onUploadBegin={(fileName) => {
+    console.log("Upload began for:", fileName);
   }}
 />
 
