@@ -1,6 +1,7 @@
 import currentProfile from "@/lib/current-profile";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function PATCH(
   req: Request,
@@ -35,6 +36,10 @@ export async function PATCH(
         imageUrl,
       },
     });
+
+    // Revalidate all paths to clear cache
+    revalidatePath("/");
+    revalidatePath(`/server/${serverId}`);
 
     // Return the updated server data
     return NextResponse.json(server);

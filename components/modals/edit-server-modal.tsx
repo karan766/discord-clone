@@ -63,12 +63,18 @@ const EditServerModal = () => {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       await axios.patch(`/api/servers/${server?.id}`, data);
+      
+      // Reset form and close modal
       form.reset();
       onClose();
-      // Refresh the page to update server data and clear image cache
+      
+      // Refresh the router to fetch new data
       router.refresh();
+      
+      // Navigate to force re-render
+      router.push(window.location.pathname);
     } catch (error) {
-      console.error("Error creating server:", error);
+      console.error("Error updating server:", error);
     }
   };
 
