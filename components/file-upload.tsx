@@ -117,7 +117,6 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
         setFileType(extension);
       }}
       onUploadError={(err: Error) => {
-        console.error("Upload Error:", err);
         alert(`Upload failed: ${err.message}`);
       }}
     />

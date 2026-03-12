@@ -121,7 +121,6 @@ export async function PATCH(
 
  }
     catch (error) {
-        console.log("Error in PATCH members", error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

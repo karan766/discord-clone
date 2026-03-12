@@ -71,7 +71,7 @@ const EditServerModal = () => {
       onClose();
       router.refresh();
     } catch (error) {
-      console.error("Error updating server:", error);
+      // Error updating server
     }
   };
 

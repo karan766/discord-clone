@@ -50,23 +50,20 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         });
 
         socketInstance.on("connect", () => {
-          console.log("✅ Socket connected");
           setIsConnected(true);
         });
 
         socketInstance.on("disconnect", () => {
-          console.log("❌ Socket disconnected");
           setIsConnected(false);
         });
 
         socketInstance.on("connect_error", (error) => {
-          console.error("🔴 Socket connection error:", error);
           setIsConnected(false);
         });
 
         setSocket(socketInstance);
       } catch (error) {
-        console.error("Failed to initialize socket:", error);
+        // Failed to initialize socket
       }
     };
 

@@ -13,8 +13,6 @@ export const config = {
 
 const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
   if (!res.socket.server.io) {
-    console.log("🔌 Initializing Socket.IO server...");
-
     const httpServer: NetServer = res.socket.server as any;
     const io = new SocketIOServer(httpServer, {
       path: "/api/socket/io", // match frontend path
@@ -27,17 +25,14 @@ const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
     });
 
     io.on("connection", (socket) => {
-      console.log("✅ Client connected:", socket.id);
-
       socket.on("disconnect", () => {
-        console.log("❌ Client disconnected:", socket.id);
+        // Client disconnected
       });
     });
 
     res.socket.server.io = io;
-    console.log("✅ Socket.IO server initialized successfully");
   } else {
-    console.log("♻️ Socket.IO server already running");
+    // Socket.IO server already running
   }
 
   res.end();

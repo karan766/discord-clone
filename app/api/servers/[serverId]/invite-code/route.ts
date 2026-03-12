@@ -29,7 +29,6 @@ export async function PATCH(
         return NextResponse.json(server);
             
     } catch (error) {
-        console.log("[SERVER_ID]", error);
         return new Response("Internal Server Error", { status: 500 });
     }
     return new Response("OK", { status: 200 });

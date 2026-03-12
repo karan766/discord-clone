@@ -65,7 +65,7 @@ const MembersModal = () => {
 
 
     } catch (error) {
-      console.log(error);
+      // Error updating member role
     } finally {
       setLoadingId("");
     }

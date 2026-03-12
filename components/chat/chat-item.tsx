@@ -117,7 +117,7 @@ const ChatItem = ({
       setIsEditing(false);
 
     }catch(error){
-      console.log(error);
+      // Error deleting message
     }
   }
 
@@ -150,7 +150,6 @@ const ChatItem = ({
   const canDeleteMessage = !deleted && (isAdmin || isModerator || isOwner);
   
   const canEditMessage = !deleted && (isAdmin || isModerator || isOwner) && !fileUrl;
-  console.log(canEditMessage);
 
 
   return (

@@ -74,7 +74,6 @@ export async function GET(
 
 
     }catch(error){
-        console.log("[MESSAGES_GET]", error);
         return new NextResponse("Internal Error", {status: 500});
     }
 }

@@ -67,8 +67,7 @@ const ChatInput = ({
       // Make a POST request to create a channel
       await axios.post(URL, values);
     } catch (error) {
-      // Handle error and log them
-      console.error(error);
+      // Error sending message
     }
 
     // Reset the form after submission

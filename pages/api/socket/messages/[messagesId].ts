@@ -138,7 +138,6 @@ export default async function handler(
 
 
     }catch (error) {
-        console.log("[MESSAGE_ID]",error);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 }
