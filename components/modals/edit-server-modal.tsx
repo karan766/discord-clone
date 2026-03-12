@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as z from "zod";
@@ -28,7 +27,6 @@ import { useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
 import { useEffect } from "react";
 
-// This is the schema for the form
 const formSchema = z.object({
   name: z.string().min(1, {
     message: "Server name is required",
@@ -39,15 +37,12 @@ const formSchema = z.object({
 });
 
 const EditServerModal = () => {
-  // This is the modal store for opening and closing the modal and getting the type of modal
   const { type, data, isOpen, onClose } = useModal();
-  // Navigation hook
   const router = useRouter();
 
   const { server } = data;
   const isModalOpen = type === "editServer" && isOpen;
 
- 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -56,33 +51,9 @@ const EditServerModal = () => {
     },
   });
 
-  // This is the loading state for the form
   const isLoading = form.formState.isSubmitting;
 
-  // This is the submit function for the form
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    try {
-      await axios.patch(`/api/servers/${server?.id}`, data);
-      
-      // Reset form and close modal
-      form.reset();
-      onClose();
-      
-      // Refresh the router to fetch new data
-      router.refresh();
-      
-      // Navigate to force re-render
-      router.push(window.location.pathname);
-    } catch (error) {
-      console.error("Error updating server:", error);
-    }
-  };
-
-  const handleClose = () => {
-    onClose();
-  };
-
-  // This is the useEffect hook to set the default values for the form
+  // Update form values when server data changes
   useEffect(() => {
     if (server) {
       form.setValue("name", server.name);
@@ -90,55 +61,51 @@ const EditServerModal = () => {
     }
   }, [server, form]);
 
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await axios.patch(`/api/servers/${server?.id}`, {
+        name: values.name,
+        imageUrl: values.imageURL,
+      });
+      
+      onClose();
+      router.refresh();
+    } catch (error) {
+      console.error("Error updating server:", error);
+    }
+  };
+
+  const handleClose = () => {
+    form.reset();
+    onClose();
+  };
+
   return (
-    <>
-      <Dialog open={isModalOpen} onOpenChange={handleClose}>
-        <DialogContent className="overflow-hidden bg-white p-0 text-black">
-          <DialogHeader className="px-6 pt-8">
-            <DialogTitle className="text-center text-2xl font-bold">
-              Create your first server
-            </DialogTitle>
-            <DialogDescription className="text-center text-zinc-500">
-              Give your server a personality with a name and an image. You can
-              always change it later.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="space-y-8 px-6">
-                <div className="flex items-center justify-center text-center">
-                  <FormField
-                    control={form.control}
-                    name="imageURL"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <FileUpload
-                            endpoint="serverImage"
-                            value={field.value}
-                            onChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
+      <DialogContent className="overflow-hidden bg-white p-0 text-black">
+        <DialogHeader className="px-6 pt-8">
+          <DialogTitle className="text-center text-2xl font-bold">
+            Customize your server
+          </DialogTitle>
+          <DialogDescription className="text-center text-zinc-500">
+            Give your server a personality with a name and an image. You can
+            always change it later.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <div className="space-y-8 px-6">
+              <div className="flex items-center justify-center text-center">
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="imageURL"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="dark:text-secondary/70 text-xs font-bold text-zinc-500 uppercase">
-                        Server Name
-                      </FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter server name"
-                          {...field}
-                          disabled={isLoading}
-                          className="border-0 bg-zinc-300/50 text-black focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-zinc-300/50"
-                          {...field}
+                        <FileUpload
+                          endpoint="serverImage"
+                          value={field.value}
+                          onChange={field.onChange}
                         />
                       </FormControl>
                       <FormMessage />
@@ -146,16 +113,36 @@ const EditServerModal = () => {
                   )}
                 />
               </div>
-              <DialogFooter className="bg-gray-100 px-6 py-4">
-                <Button disabled={isLoading} variant={"primary"}>
-                  Save
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="dark:text-secondary/70 text-xs font-bold text-zinc-500 uppercase">
+                      Server Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter server name"
+                        disabled={isLoading}
+                        className="border-0 bg-zinc-300/50 text-black focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-zinc-300/50"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <DialogFooter className="bg-gray-100 px-6 py-4">
+              <Button disabled={isLoading} variant={"primary"} type="submit">
+                Save
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
